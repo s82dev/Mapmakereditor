@@ -1,62 +1,17 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Map Editor</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-
-<body>
-
+<!DOCTYPE html><html lang="de"><head><meta charset="UTF-8">
+<title>Map Editor</title><link rel="stylesheet" href="style.css"></head><body>
 <div id="toolbar">
-
-    <label>Breite</label>
-    <input id="w" type="number" value="20" min="1">
-
-    <label>Höhe</label>
-    <input id="h" type="number" value="20" min="1">
-
-    <button id="newMapBtn">Neue Map</button>
-
-    <hr>
-
-    <span>Tiles:</span>
-
-    <button class="tileBtn" data-tile="0">0</button>
-    <button class="tileBtn" data-tile="1">1</button>
-    <button class="tileBtn" data-tile="2">2</button>
-    <button class="tileBtn" data-tile="3">3</button>
-
-    <hr>
-
-    <button id="spawnBtn">Spawn</button>
-    <button id="chestBtn">Kiste</button>
-
-    <hr>
-
-    <button id="undoBtn">Undo</button>
-    <button id="redoBtn">Redo</button>
-
-    <hr>
-
-    <button id="exportBtn">Export</button>
-
-    <input id="importFile"
-           type="file"
-           accept=".json">
-
-    <hr>
-
-    <span id="coords">
-        X:0 Y:0
-    </span>
-
+Breite <input id="w" type="number" value="20" min="1" style="width:60px">
+Höhe <input id="h" type="number" value="20" min="1" style="width:60px">
+<button onclick="newMap()">Neue Map</button><br><br>
+<button onclick="selectTile(0)">0</button>
+<button onclick="selectTile(1)">1</button>
+<button onclick="selectTile(2)">2</button>
+<button onclick="selectTile(3)">3</button>
+<button onclick="selectChest()">Kiste</button>
+<button onclick="selectSpawn()">Spawn</button>
+<button onclick="exportMap()">Export</button>
+<input type="file" onchange="importMap(this.files[0])">
 </div>
-
 <canvas id="map"></canvas>
-
-<script src="editor.js"></script>
-
-</body>
-</html>
+<script src="editor.js"></script></body></html>
