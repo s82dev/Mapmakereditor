@@ -251,3 +251,125 @@ document.getElementById("newMapBtn").onclick=()=>{
     draw();
 
 };
+// ---------- Undo ----------
+
+function undoMap() {
+
+    if (undoStack.length === 0) return;
+
+    redoStack.push(JSON.stringify(map));
+
+    map = JSON.parse(undoStack.pop());
+
+    draw();
+
+}
+
+// ---------- Redo ----------
+
+function redoMap() {
+
+    if (redoStack.length === 0) return;
+
+    undoStack.push(JSON.stringify(map));
+
+    map = JSON.parse(redoStack.pop());
+
+    draw();
+
+}
+
+// ---------- Buttons ----------
+
+document.getElementById("undoBtn").onclick = undoMap;
+document.getElementById("redoBtn").onclick = redoMap;
+
+// ---------- Tastenkürzel ----------
+
+document.addEventListener("keydown", e => {
+
+    if (e.ctrlKey && e.key.toLowerCase() === "z") {
+
+        e.preventDefault();
+
+        undoMap();
+
+    }
+
+    if (e.ctrlKey && e.key.toLowerCase() === "y") {
+
+        e.preventDefault();
+
+        redoMap();
+
+    }
+
+});
+
+// ---------- Export ----------
+
+document.getElementById("exportBtn").onclick = () => {
+
+    const json = JSON.stringify(map, null, 2);
+
+    const blob = new Blob([json], {
+        type: "application/json"
+    });
+
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+
+    a.href = url;
+    a.download = "map.json";
+
+    document.body.appendChild(a);
+
+    a.click();
+
+    document.body.removeChild(a);
+
+    URL.revokeObjectURL(url);
+
+};
+
+// ---------- Import ----------
+
+document.getElementById("importFile").addEventListener("change", e => {
+
+    const file = e.target.files[0];
+
+    if (!file) return;
+
+    const reader = new FileReader();
+
+    reader.onload = () => {
+
+        try {
+
+            map = JSON.parse(reader.result);
+
+            if (!map.spawn)
+                map.spawn = { x: 0, y: 0 };
+
+            if (!map.objects)
+                map.objects = [];
+
+            document.getElementById("w").value = map.width;
+            document.getElementById("h").value = map.height;
+
+            draw();
+
+        } catch (err) {
+
+            alert("Fehler beim Import der Map!");
+
+            console.error(err);
+
+        }
+
+    };
+
+    reader.readAsText(file);
+
+});
