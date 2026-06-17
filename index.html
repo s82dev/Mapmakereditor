@@ -1,21 +1,16 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-<meta charset="UTF-8">
-<title>Map Editor</title>
-<link rel="stylesheet" href="style.css">
-</head>
-<body>
+<!DOCTYPE html><html lang="de"><head><meta charset="UTF-8">
+<title>Map Editor</title><link rel="stylesheet" href="style.css"></head><body>
 <div id="toolbar">
-<button onclick="selectTile(0)">0 Schwarz</button>
-<button onclick="selectTile(1)">1 Grau</button>
-<button onclick="selectTile(2)">2 Grün</button>
-<button onclick="selectTile(3)">3 Blau</button>
+Breite <input id="w" type="number" value="20" min="1" style="width:60px">
+Höhe <input id="h" type="number" value="20" min="1" style="width:60px">
+<button onclick="newMap()">Neue Map</button><br><br>
+<button onclick="selectTile(0)">0</button>
+<button onclick="selectTile(1)">1</button>
+<button onclick="selectTile(2)">2</button>
+<button onclick="selectTile(3)">3</button>
 <button onclick="selectChest()">Kiste</button>
 <button onclick="exportMap()">Export</button>
 <input type="file" onchange="importMap(this.files[0])">
 </div>
 <canvas id="map"></canvas>
-<script src="editor.js"></script>
-</body>
-</html>
+<script src="editor.js"></script></body></html>
