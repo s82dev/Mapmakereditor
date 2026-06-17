@@ -1,39 +1,62 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Map Editor</title>
-<link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Map Editor</title>
+    <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
+
 <div id="toolbar">
-<div class="row">
-Breite <input id="w" type="number" value="20" min="1">
-Höhe <input id="h" type="number" value="20" min="1">
-<button onclick="newMap()">Neue Map</button>
-<button onclick="doUndo()">↶ Undo</button>
-<button onclick="doRedo()">↷ Redo</button>
+
+    <label>Breite</label>
+    <input id="w" type="number" value="20" min="1">
+
+    <label>Höhe</label>
+    <input id="h" type="number" value="20" min="1">
+
+    <button id="newMapBtn">Neue Map</button>
+
+    <hr>
+
+    <span>Tiles:</span>
+
+    <button class="tileBtn" data-tile="0">0</button>
+    <button class="tileBtn" data-tile="1">1</button>
+    <button class="tileBtn" data-tile="2">2</button>
+    <button class="tileBtn" data-tile="3">3</button>
+
+    <hr>
+
+    <button id="spawnBtn">Spawn</button>
+    <button id="chestBtn">Kiste</button>
+
+    <hr>
+
+    <button id="undoBtn">Undo</button>
+    <button id="redoBtn">Redo</button>
+
+    <hr>
+
+    <button id="exportBtn">Export</button>
+
+    <input id="importFile"
+           type="file"
+           accept=".json">
+
+    <hr>
+
+    <span id="coords">
+        X:0 Y:0
+    </span>
+
 </div>
-<div class="row">
-<button onclick="selectTile(0)">0</button>
-<button onclick="selectTile(1)">1</button>
-<button onclick="selectTile(2)">2</button>
-<button onclick="selectTile(3)">3</button>
-<button onclick="selectFill()">Füllen</button>
-<button onclick="selectRect()">Rechteck</button>
-<button onclick="selectChest()">Kiste</button>
-<button onclick="selectSpawn()">Spawn</button>
-Zoom <input id="zoom" type="range" min="0.5" max="3" step="0.25" value="1" oninput="setZoom(this.value)">
-<span id="zoomText">100%</span>
-<span id="coords">X:0 Y:0</span>
-</div>
-<div class="row">
-<button onclick="exportMap()">Export</button>
-<input type="file" onchange="importMap(this.files[0])">
-</div>
-</div>
+
 <canvas id="map"></canvas>
+
 <script src="editor.js"></script>
+
 </body>
 </html>
