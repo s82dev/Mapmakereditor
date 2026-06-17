@@ -1,4 +1,7 @@
-const TILE_SIZE = 32;
+const TILE = 32;
+
+const canvas = document.getElementById("map");
+const ctx = canvas.getContext("2d");
 
 let map = {
     width: 20,
@@ -8,57 +11,57 @@ let map = {
     objects: []
 };
 
-let selectedTile = 2;
-let objectMode = false;
-let spawnMode = false;
+let selectedTile = 0;
+let tool = "tile";
 
-// Neu
 let drawing = false;
-let undoStack = [];
-let redoStack = [];
+
+let undo = [];
+let redo = [];
 
 function saveState() {
-    undoStack.push(JSON.stringify(map));
+    undo.push(JSON.stringify(map));
 
-    if (undoStack.length > 50)
-        undoStack.shift();
+    if (undo.length > 50)
+        undo.shift();
 
-    redoStack = [];
+    redo = [];
 }
 
-function undo() {
+function undoMap() {
 
-    if (undoStack.length === 0) return;
+    if (undo.length === 0) return;
 
-    redoStack.push(JSON.stringify(map));
+    redo.push(JSON.stringify(map));
 
-    map = JSON.parse(undoStack.pop());
+    map = JSON.parse(undo.pop());
 
-    drawMap();
+    draw();
 
 }
 
-function redo() {
+function redoMap() {
 
-    if (redoStack.length === 0) return;
+    if (redo.length === 0) return;
 
-    undoStack.push(JSON.stringify(map));
+    undo.push(JSON.stringify(map));
 
-    map = JSON.parse(redoStack.pop());
+    map = JSON.parse(redo.pop());
 
-    drawMap();
+    draw();
 
 }
 
 function createMap(w, h) {
 
-    map = {
-        width: w,
-        height: h,
-        spawn: { x: 0, y: 0 },
-        tiles: [],
-        objects: []
-    };
+    map.width = w;
+    map.height = h;
+
+    map.tiles = [];
+
+    map.objects = [];
+
+    map.spawn = { x: 0, y: 0 };
 
     for (let y = 0; y < h; y++) {
 
@@ -71,28 +74,14 @@ function createMap(w, h) {
 
     }
 
-    drawMap();
+    draw();
 
 }
 
-function newMap() {
+function draw() {
 
-    saveState();
-
-    createMap(
-        parseInt(w.value),
-        parseInt(h.value)
-    );
-
-}
-
-function drawMap() {
-
-    const canvas = document.getElementById("map");
-    const ctx = canvas.getContext("2d");
-
-    canvas.width = map.width * TILE_SIZE;
-    canvas.height = map.height * TILE_SIZE;
+    canvas.width = map.width * TILE;
+    canvas.height = map.height * TILE;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -110,19 +99,19 @@ function drawMap() {
             ctx.fillStyle = colors[map.tiles[y][x]];
 
             ctx.fillRect(
-                x * TILE_SIZE,
-                y * TILE_SIZE,
-                TILE_SIZE,
-                TILE_SIZE
+                x * TILE,
+                y * TILE,
+                TILE,
+                TILE
             );
 
             ctx.strokeStyle = "#333";
 
             ctx.strokeRect(
-                x * TILE_SIZE,
-                y * TILE_SIZE,
-                TILE_SIZE,
-                TILE_SIZE
+                x * TILE,
+                y * TILE,
+                TILE,
+                TILE
             );
 
         }
@@ -134,8 +123,8 @@ function drawMap() {
     for (const o of map.objects) {
 
         ctx.fillRect(
-            o.x * TILE_SIZE + 8,
-            o.y * TILE_SIZE + 8,
+            o.x * TILE + 8,
+            o.y * TILE + 8,
             16,
             16
         );
@@ -147,195 +136,139 @@ function drawMap() {
     ctx.fillStyle = "white";
 
     ctx.arc(
-        map.spawn.x * TILE_SIZE + TILE_SIZE / 2,
-        map.spawn.y * TILE_SIZE + TILE_SIZE / 2,
+        map.spawn.x * TILE + TILE / 2,
+        map.spawn.y * TILE + TILE / 2,
         8,
         0,
         Math.PI * 2
     );
-const canvas = document.getElementById("map");
 
-canvas.oncontextmenu = e => e.preventDefault();
+    ctx.fill();
 
-function getMousePos(e) {
+}
 
-    const r = canvas.getBoundingClientRect();
+createMap(20,20);
+function getTilePos(e){
 
-    return {
+    const rect=canvas.getBoundingClientRect();
 
-        x: Math.floor((e.clientX - r.left) / TILE_SIZE),
-        y: Math.floor((e.clientY - r.top) / TILE_SIZE)
-
+    return{
+        x:Math.floor((e.clientX-rect.left)/TILE),
+        y:Math.floor((e.clientY-rect.top)/TILE)
     };
 
 }
 
-function paint(x, y, rightClick = false) {
+function paint(x,y,right=false){
 
-    if (x < 0 || y < 0 || x >= map.width || y >= map.height)
-        return;
+    if(x<0||y<0||x>=map.width||y>=map.height) return;
 
-    if (spawnMode) {
+    if(tool==="spawn"){
 
-        map.spawn = { x, y };
+        map.spawn={x,y};
 
-        spawnMode = false;
-
-        drawMap();
+        draw();
 
         return;
 
     }
 
-    if (objectMode) {
+    if(tool==="chest"){
 
-        const i = map.objects.findIndex(o =>
-            o.type === "chest" &&
-            o.x === x &&
-            o.y === y
-        );
+        const i=map.objects.findIndex(o=>o.type==="chest"&&o.x===x&&o.y===y);
 
-        if (i >= 0)
-            map.objects.splice(i, 1);
-        else
+        if(i>=0){
+
+            map.objects.splice(i,1);
+
+        }else{
+
             map.objects.push({
-                type: "chest",
+                type:"chest",
                 x,
                 y
             });
 
-        drawMap();
+        }
+
+        draw();
 
         return;
 
     }
 
-    map.tiles[y][x] = rightClick ? 0 : selectedTile;
+    map.tiles[y][x]=right?0:selectedTile;
 
-    drawMap();
+    draw();
 
 }
 
-canvas.onmousedown = e => {
+canvas.oncontextmenu=e=>e.preventDefault();
+
+canvas.onmousedown=e=>{
 
     saveState();
 
-    drawing = true;
+    drawing=true;
 
-    const p = getMousePos(e);
+    const p=getTilePos(e);
 
-    paint(p.x, p.y, e.button === 2);
-
-};
-
-canvas.onmousemove = e => {
-
-    const p = getMousePos(e);
-
-    coords.textContent = `X:${p.x} Y:${p.y}`;
-
-    if (!drawing)
-        return;
-
-    paint(p.x, p.y, (e.buttons & 2) !== 0);
+    paint(p.x,p.y,e.button===2);
 
 };
 
-window.onmouseup = () => {
+canvas.onmousemove=e=>{
 
-    drawing = false;
+    const p=getTilePos(e);
+
+    document.getElementById("coords").textContent=`X:${p.x} Y:${p.y}`;
+
+    if(!drawing) return;
+
+    paint(p.x,p.y,(e.buttons&2)!==0);
 
 };
 
-function selectTile(t) {
+window.onmouseup=()=>{
 
-    selectedTile = t;
+    drawing=false;
 
-    objectMode = false;
+};
 
-    spawnMode = false;
+document.querySelectorAll(".tileBtn").forEach(btn=>{
 
-}
+    btn.onclick=()=>{
 
-function selectChest() {
+        selectedTile=parseInt(btn.dataset.tile);
 
-    objectMode = true;
-
-    spawnMode = false;
-
-}
-
-function selectSpawn() {
-
-    objectMode = false;
-
-    spawnMode = true;
-
-}
-
-document.addEventListener("keydown", e => {
-
-    if (e.ctrlKey && e.key.toLowerCase() === "z") {
-
-        e.preventDefault();
-
-        undo();
-
-    }
-
-    if (e.ctrlKey && e.key.toLowerCase() === "y") {
-
-        e.preventDefault();
-
-        redo();
-
-    }
-
-});
-
-function exportMap() {
-
-    const blob = new Blob(
-        [JSON.stringify(map, null, 2)],
-        { type: "application/json" }
-    );
-
-    const a = document.createElement("a");
-
-    a.href = URL.createObjectURL(blob);
-
-    a.download = "map.json";
-
-    a.click();
-
-}
-
-function importMap(file) {
-
-    const reader = new FileReader();
-
-    reader.onload = () => {
-
-        saveState();
-
-        map = JSON.parse(reader.result);
-
-        if (!map.spawn)
-            map.spawn = { x: 0, y: 0 };
-
-        w.value = map.width;
-
-        h.value = map.height;
-
-        drawMap();
+        tool="tile";
 
     };
 
-    reader.readAsText(file);
+});
 
-}
+document.getElementById("spawnBtn").onclick=()=>{
 
-createMap(20, 20);
-    ctx.fill();
+    tool="spawn";
 
-}
+};
+
+document.getElementById("chestBtn").onclick=()=>{
+
+    tool="chest";
+
+};
+
+document.getElementById("newMapBtn").onclick=()=>{
+
+    saveState();
+
+    createMap(
+
+        parseInt(document.getElementById("w").value),
+
+        parseInt(document.getElementById("h").value)
+
+    );
+
+};
