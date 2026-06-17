@@ -272,3 +272,83 @@ document.getElementById("newMapBtn").onclick=()=>{
     );
 
 };
+// ---------- Undo / Redo Buttons ----------
+
+document.getElementById("undoBtn").onclick = undoMap;
+document.getElementById("redoBtn").onclick = redoMap;
+
+// ---------- Tastenkürzel ----------
+
+document.addEventListener("keydown", e => {
+
+    if (e.ctrlKey && e.key.toLowerCase() === "z") {
+        e.preventDefault();
+        undoMap();
+    }
+
+    if (e.ctrlKey && e.key.toLowerCase() === "y") {
+        e.preventDefault();
+        redoMap();
+    }
+
+});
+
+// ---------- Export ----------
+
+document.getElementById("exportBtn").onclick = () => {
+
+    const blob = new Blob(
+        [JSON.stringify(map, null, 2)],
+        { type: "application/json" }
+    );
+
+    const a = document.createElement("a");
+
+    a.href = URL.createObjectURL(blob);
+    a.download = "map.json";
+    a.click();
+
+    URL.revokeObjectURL(a.href);
+
+};
+
+// ---------- Import ----------
+
+document.getElementById("importFile").addEventListener("change", e => {
+
+    const file = e.target.files[0];
+
+    if (!file) return;
+
+    const reader = new FileReader();
+
+    reader.onload = () => {
+
+        try {
+
+            saveState();
+
+            map = JSON.parse(reader.result);
+
+            if (!map.spawn)
+                map.spawn = { x: 0, y: 0 };
+
+            if (!map.objects)
+                map.objects = [];
+
+            document.getElementById("w").value = map.width;
+            document.getElementById("h").value = map.height;
+
+            draw();
+
+        } catch {
+
+            alert("Ungültige Map-Datei.");
+
+        }
+
+    };
+
+    reader.readAsText(file);
+
+});
