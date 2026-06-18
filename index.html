@@ -1,17 +1,24 @@
-<!DOCTYPE html><html lang="de"><head><meta charset="UTF-8">
-<title>Map Editor</title><link rel="stylesheet" href="style.css"></head><body>
-<div id="toolbar">
-Breite <input id="w" type="number" value="20" min="1" style="width:60px">
-Höhe <input id="h" type="number" value="20" min="1" style="width:60px">
-<button onclick="newMap()">Neue Map</button><br><br>
-<button onclick="selectTile(0)">0</button>
-<button onclick="selectTile(1)">1</button>
-<button onclick="selectTile(2)">2</button>
-<button onclick="selectTile(3)">3</button>
-<button onclick="selectChest()">Kiste</button>
-<button onclick="selectSpawn()">Spawn</button>
-<button onclick="exportMap()">Export</button>
-<input type="file" onchange="importMap(this.files[0])">
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2D RPG</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<h1>2D RPG</h1>
+<div id="gameContainer">
+<div>
+<input type="file" id="file" accept=".json"><br><br>
+<canvas id="game" width="640" height="640"></canvas>
 </div>
-<canvas id="map"></canvas>
-<script src="editor.js"></script></body></html>
+<div id="inventory">
+<h2>Inventar</h2>
+<p>🪙 Gold: <span id="gold">0</span></p>
+<p>Drücke E neben einer Kiste.</p>
+</div>
+</div>
+<script src="script.js"></script>
+</body>
+</html>
